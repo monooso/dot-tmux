@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Quickly navigate to any code directory
 selected=$(find ~/bin ~/dotfiles ~/personal ~/work -maxdepth 1 -mindepth 1 -type d | fzf)
