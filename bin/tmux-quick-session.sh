@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
+# -----------------------------------------------------------------------------
 # Quickly navigate to any code directory
+# -----------------------------------------------------------------------------
+
+# Find all of the "code" directories, and use FZF to fuzzy-find the desired one.
 selected=$(find ~/bin ~/dotfiles ~/personal ~/work -maxdepth 1 -mindepth 1 -type d | fzf)
 
+# If no directory was selected, we're done.
 if [[ -z $selected ]]; then
   exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
+# Use the normalised basename of the selected directory as our session name.
+selected_name=$(basename "$selected" | tr " -" "_" | tr "[:upper:]" "[:lower:]" | tr -cd "[:alnum:]_")
 tmux_running=$(pgrep tmux)
 
 # $TMUX is set if we're inside a tmux session
