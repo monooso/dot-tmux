@@ -27,12 +27,11 @@ selected_name=$(
     | tr -c "[:alnum:]" "_"
   )
 
-# Check if there is an active tmux process.
-tmux_running=$(pgrep tmux)
+# Ensure the tmux server is running.
+tmux start-server
 
-# tmux is not currently running, or we don't have the required session.
-# Either way, create the session, but don't attach to it.
-if [[ -z $tmux_running ]] || ! tmux has-session -t $selected_name 2> /dev/null; then
+# Create the session if is doesn't exist; don't attach to it.
+if ! tmux has-session -t $selected_name 2> /dev/null; then
   # Open three windows: vim, shell, server
   tmux new-session -s $selected_name -c $selected -n vim -d
   tmux new-window -t $selected_name -c $selected -n shell
