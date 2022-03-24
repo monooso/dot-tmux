@@ -4,16 +4,29 @@
 # Quickly navigate to any code directory, and create a tmux session
 # -----------------------------------------------------------------------------
 
-# Find all of the "code" directories, and use FZF to fuzzy-find the desired one.
-selected=$(find ~/bin ~/dotfiles ~/personal ~/work -maxdepth 1 -mindepth 1 -type d | fzf)
+dotfiles=$(find ~/dotfiles -maxdepth 1 -mindepth 1 -type d)
+personal=$(find ~/personal -maxdepth 2 -mindepth 1 -type d)
+work=$(find ~/work -maxdepth 2 -mindepth 1 -type d)
+
+all_directories="${dotfiles}\n${personal}\n${work}"
+
+# Use FZF to fuzzy-find the desired directory.
+selected=$(echo "$all_directories" | fzf)
 
 # If no directory was selected, we're done.
 if [[ -z $selected ]]; then
   exit 0
 fi
 
-# Use the normalised basename of the selected directory as our session name.
-selected_name=$(basename "$selected" | tr " -" "_" | tr "[:upper:]" "[:lower:]" | tr -cd "[:alnum:]_")
+# Extract the last two segments of the selected directory, and normalise the
+# string. This is our session name.
+selected_name=$(
+  echo "$(basename $(dirname "$selected"))_$(basename "$selected")" \
+    | tr -d "[:space:]" \
+    | tr "[:upper:]" "[:lower:]" \
+    | tr -c "[:alnum:]" "_"
+  )
+
 tmux_running=$(pgrep tmux)
 
 # tmux is not currently running, or we don't have the required session.
