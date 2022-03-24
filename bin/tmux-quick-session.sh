@@ -27,6 +27,7 @@ selected_name=$(
     | tr -c "[:alnum:]" "_"
   )
 
+# Check if there is an active tmux process.
 tmux_running=$(pgrep tmux)
 
 # tmux is not currently running, or we don't have the required session.
@@ -37,8 +38,9 @@ if [[ -z $tmux_running ]] || ! tmux has-session -t $selected_name 2> /dev/null; 
   tmux new-window -t $selected_name -c $selected -n shell
   tmux new-window -t $selected_name -c $selected -n server
 
-  # Focus the vim window. We can't really launch it, because of nested git worktree directories.
+  # Focus the "vim" window, and launch neovim.
   tmux select-window -t $selected_name:1
+  tmux send-keys -t $selected_name:1 "nvim" C-m
 fi
 
 # If we're *inside* tmux, switch to the session; otherwise attach to it.
